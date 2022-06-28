@@ -97,15 +97,6 @@ import {
 } from "@apollo/client";
 import "./index.css";
 
-const ALL_PEOPLE = gql`
-  query AllPeople {
-    people {
-      id
-      name
-    }
-  }
-`;
-
 const ADD_PERSON = gql`
   mutation AddPerson($name: String) {
     addPerson(name: $name) {
@@ -121,7 +112,7 @@ const PersonFragment = gql`
   }
 `;
 
-const peopleQuery = gql`
+const ALL_PEOPLE = gql`
   query AllPeople {
     people {
       id
@@ -146,7 +137,7 @@ function App() {
 
 const Names = () => {
   const { useData, useLoading } = useBackgroundQuery({
-    query: peopleQuery,
+    query: ALL_PEOPLE,
   });
   const loading = useLoading();
   const data = useData();
