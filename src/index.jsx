@@ -115,36 +115,21 @@ const ADD_PERSON = gql`
   }
 `;
 
-// const PersonFragment = gql`
-//   fragment PersonFragment on Person {
-//     text
-//   }
-// `;
+const PersonFragment = gql`
+  fragment PersonFragment on Person {
+    name
+  }
+`;
 
-// const peopleQuery = gql`
-//   query AllPeople {
-//     people {
-//       id
-//       name
-//     }
-//   }
-//   ${PersonFragment}
-// `;
-
-// const {
-//   observable,
-//   useLoading,
-//   useNetworkStatus,
-//   useError,
-//   useData,
-// } = useBackgroundQuery({
-//   query: ALL_PEOPLE,
-// });
-
-// const { complete, data } = useFragment({
-//   fragment: ListFragment,
-//   from: { __typename: "Query" },
-// });
+const peopleQuery = gql`
+  query AllPeople {
+    people {
+      id
+      ...PersonFragment
+    }
+  }
+  ${PersonFragment}
+`;
 
 function App() {
   return (
@@ -160,7 +145,12 @@ function App() {
 }
 
 const Names = () => {
-  const { loading, data } = useQuery(ALL_PEOPLE);
+  const { useData, useLoading } = useBackgroundQuery({
+    query: peopleQuery,
+  });
+  const loading = useLoading();
+  const data = useData();
+
   return (
     <>
       <h2>Names</h2>
@@ -169,12 +159,23 @@ const Names = () => {
       ) : (
         <ul>
           {data?.people.map((person) => (
-            <li key={person.id}>{person.name}</li>
+            <Person key={person.id} id={person.id} />
           ))}
         </ul>
       )}
     </>
   );
+};
+
+const Person = (props) => {
+  const { complete, data } = useFragment({
+    fragment: PersonFragment,
+    from: {
+      __typename: "Person",
+      id: props.id,
+    },
+  });
+  return <li key={props.id}>{data.name}</li>;
 };
 
 const AddPerson = () => {
